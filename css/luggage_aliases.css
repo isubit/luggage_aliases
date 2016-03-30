@@ -11,3 +11,13 @@
 .media-left {
     padding-right: 10px;
 }
+
+.img-avatar {
+    width: 37px;
+    height: 37px;
+    vertical-align: middle;
+}
+
+.img-circle {
+    border-radius: 100%;
+}
