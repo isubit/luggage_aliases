@@ -85,6 +85,11 @@ function luggage_aliases_field_formatter_info() {
       'field types' => array('taxonomy_term_reference'),
       'description' => t('Displays the author\'s profile image, name, & bio.'),
     ),
+    'views_blog_hero' => array(
+      'label' => t('Views Blog Hero Display'),
+      'field types' => array('taxonomy_term_reference'),
+      'description' => t('Displays the blog author\'s profile image, name, & bio in a big way.'),
+    ),
   );
   return $info;
 }
@@ -138,7 +143,7 @@ function luggage_aliases_field_formatter_view($entity_type, $entity, $field, $in
             '#theme' => 'luggage_aliases_views_node_author',
             '#image_src' => (isset($user->field_people_image[LANGUAGE_NONE][0]))?image_style_url('thumbnail',$user->field_people_image[LANGUAGE_NONE][0]['uri']) : '',
             '#name' => trim($user->title),
-            '#url' => $user->nid,
+            '#url' => url('blog/' . strtolower(str_replace(' ', '-', trim($user->title)))),
             '#created' => format_date($entity->created),
           );
         } else {
@@ -155,6 +160,10 @@ function luggage_aliases_field_formatter_view($entity_type, $entity, $field, $in
       }
       drupal_add_css(drupal_get_path('module', 'luggage_aliases') . '/css/luggage_aliases.css');
       break;
+    case 'views_blog_hero':
+      foreach($items as $delta => $item) {
+        $user = _luggage_aliases_get_person_by_tid($item['tid']);
+      }
   }
   return $element;
 }
