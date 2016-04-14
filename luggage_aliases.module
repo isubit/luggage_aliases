@@ -144,7 +144,7 @@ function luggage_aliases_field_formatter_view($entity_type, $entity, $field, $in
             // '#image' => theme_image_formatter(array(
             //   'item' => array(
             //     '')))
-            '#image_src' => (isset($user->field_people_image[LANGUAGE_NONE][0]))?image_style_url('blog_avatar',$user->field_people_image[LANGUAGE_NONE][0]['uri']) : '',
+            '#image_src' => (isset($user->field_people_image[LANGUAGE_NONE][0]))?image_style_url('aliases_avatar',$user->field_people_image[LANGUAGE_NONE][0]['uri']) : '',
             '#name' => trim($user->title),
             '#url' => url('blog/' . strtolower(str_replace(' ', '-', trim($user->title)))),
             '#created' => format_date($entity->created),
