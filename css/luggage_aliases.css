@@ -4,7 +4,7 @@
 
 .media-left,.media-body {
     display: table-cell;
-    vertical-align: top;
+    vertical-align: bottom;
 }
 
 .media-left {
@@ -12,8 +12,7 @@
 }
 
 .img-avatar {
-    width: 37px;
-    height: 37px;
+    height: 56px;
     vertical-align: middle;
 }
 
