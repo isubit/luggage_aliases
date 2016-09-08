@@ -98,7 +98,7 @@ function _luggage_aliases_get_person_by_tid($tid) {
   $query = db_select('taxonomy_index','t')->fields('t');
   $query->condition('t.tid',$tid,'=');
   $nodes = db_select('node','n')->fields('n')->condition('type','people');
-  $d = $query->join($nodes,'n','t.nid = n.nid');
+  $query->join($nodes,'n','t.nid = n.nid');
   $data = $query->execute()->fetchCol();
   return ($data) ? node_load($data[0]) : Null;
 }
@@ -138,19 +138,16 @@ function luggage_aliases_field_formatter_view($entity_type, $entity, $field, $in
     case 'views_node_author':
       foreach ($items as $delta => $item) {
         $user = _luggage_aliases_get_person_by_tid($item['tid']);
-        if ($user) {
+        $term = taxonomy_term_load($item['tid']);
+        if ($user && $term) {
           $element[$delta] = array(
             '#theme' => 'luggage_aliases_views_node_author',
-            // '#image' => theme_image_formatter(array(
-            //   'item' => array(
-            //     '')))
             '#image_src' => (isset($user->field_people_image[LANGUAGE_NONE][0]))?image_style_url('aliases_avatar',$user->field_people_image[LANGUAGE_NONE][0]['uri']) : '',
             '#name' => trim($user->title),
-            '#url' => url('blog/' . strtolower(str_replace(' ', '-', trim($user->title)))),
+            '#url' => url('blog/' . strtolower(str_replace(' ', '-', trim($term->name)))),
             '#created' => format_date($entity->created),
           );
         } else {
-          $term = taxonomy_term_load($item['tid']);
           if($term) {
             $element[$delta] = array(
               '#theme' => 'luggage_aliases_views_node_author',
