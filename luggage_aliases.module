@@ -78,10 +78,29 @@ function luggage_aliases_field_formatter_info() {
     'author_list' => array(
       'label' => t('Author List'),
       'field types' => array('taxonomy_term_reference'),
-      'description' => t('Displays Title as a link and URL as plain text.'),
+      'description' => t('Displays the author\'s profile image, name, & bio.'),
+    ),
+    'views_node_author' => array(
+      'label' => t('Views Node Author'),
+      'field types' => array('taxonomy_term_reference'),
+      'description' => t('Displays the author\'s profile image, name, & bio.'),
+    ),
+    'views_blog_hero' => array(
+      'label' => t('Views Blog Hero Display'),
+      'field types' => array('taxonomy_term_reference'),
+      'description' => t('Displays the blog author\'s profile image, name, & bio in a big way.'),
     ),
   );
   return $info;
+}
+
+function _luggage_aliases_get_person_by_tid($tid) {
+  $query = db_select('taxonomy_index','t')->fields('t');
+  $query->condition('t.tid',$tid,'=');
+  $nodes = db_select('node','n')->fields('n')->condition('type','people');
+  $query->join($nodes,'n','t.nid = n.nid');
+  $data = $query->execute()->fetchCol();
+  return ($data) ? node_load($data[0]) : Null;
 }
 
 /**
@@ -92,16 +111,11 @@ function luggage_aliases_field_formatter_view($entity_type, $entity, $field, $in
   switch ($display['type']) {
     case 'author_list':
       foreach ($items as $delta => $item) {
-        $query = db_select('taxonomy_index','t')->fields('t');
-        $query->condition('t.tid',$item['tid'],'=');
-        $nodes = db_select('node','n')->fields('n')->condition('type','people');
-        $d = $query->join($nodes,'n','t.nid = n.nid');
-        $data = $query->execute()->fetchCol();
-        if($data) {
-          $user = node_load($data[0]);
+        $user = _luggage_aliases_get_person_by_tid($item['tid']);
+        if($user) {
           $element[$delta] = array(
             '#theme' => 'luggage_aliases_default',
-            '#image_src' => image_style_url('thumbnail',$user->field_people_image[LANGUAGE_NONE][0]['uri']),
+            '#image_src' => (isset($user->field_people_image[LANGUAGE_NONE][0]))?image_style_url('thumbnail',$user->field_people_image[LANGUAGE_NONE][0]['uri']) : '',
             '#firstname' => $user->field_people_first_name[LANGUAGE_NONE][0]['value'],
             '#lastname' => $user->field_people_last_name[LANGUAGE_NONE][0]['value'],
             '#position' => $user->field_people_position[LANGUAGE_NONE][0]['value'],
@@ -121,6 +135,35 @@ function luggage_aliases_field_formatter_view($entity_type, $entity, $field, $in
       }
       drupal_add_css(drupal_get_path('module', 'luggage_aliases') . '/css/luggage_aliases.css');
       break;
+    case 'views_node_author':
+      foreach ($items as $delta => $item) {
+        $user = _luggage_aliases_get_person_by_tid($item['tid']);
+        $term = taxonomy_term_load($item['tid']);
+        if ($user && $term) {
+          $element[$delta] = array(
+            '#theme' => 'luggage_aliases_views_node_author',
+            '#image_src' => (isset($user->field_people_image[LANGUAGE_NONE][0]))?image_style_url('aliases_avatar',$user->field_people_image[LANGUAGE_NONE][0]['uri']) : '',
+            '#name' => trim($user->title),
+            '#url' => url('blog/' . strtolower(str_replace(' ', '-', trim($term->name)))),
+            '#created' => format_date($entity->created),
+          );
+        } else {
+          if($term) {
+            $element[$delta] = array(
+              '#theme' => 'luggage_aliases_views_node_author',
+              '#aliasName' => $term->name,
+              '#url' => '/authors/' . $term->tid,
+              '#created' => format_date($entity->created),
+            );
+          }
+        }
+      }
+      drupal_add_css(drupal_get_path('module', 'luggage_aliases') . '/css/luggage_aliases.css');
+      break;
+    case 'views_blog_hero':
+      foreach($items as $delta => $item) {
+        $user = _luggage_aliases_get_person_by_tid($item['tid']);
+      }
   }
   return $element;
 }
@@ -142,7 +185,18 @@ function luggage_aliases_theme() {
         'aliasName' => Null,
       ),
       'path' => drupal_get_path('module','luggage_aliases') . '/templates'
-    )
+    ),
+    'luggage_aliases_views_node_author' => array(
+      'template' => 'luggage_aliases_views_node_author',
+      'variables' => array(
+        'image_src' => Null,
+        'name' => Null,
+        'url' => Null,
+        'aliasName' => Null,
+        'created' => Null,
+      ),
+      'path' => drupal_get_path('module','luggage_aliases') . '/templates'
+    ),
   );
 }
 
