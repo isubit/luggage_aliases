@@ -120,7 +120,7 @@ function luggage_aliases_field_formatter_view($entity_type, $entity, $field, $in
             '#lastname' => $user->field_people_last_name[LANGUAGE_NONE][0]['value'],
             '#position' => $user->field_people_position[LANGUAGE_NONE][0]['value'],
             '#url' => $user->nid,
-            '#bio' => (isset($user->field_people_bio[LANGUAGE_NONE][0]['value']))?substr($user->field_people_bio[LANGUAGE_NONE][0]['value'],0,300) . '...':'',
+            '#bio' => (isset($user->field_people_bio[LANGUAGE_NONE][0]['value']))?filter_dom_serialize(filter_dom_load(substr($user->field_people_bio[LANGUAGE_NONE][0]['value'],0,300) . '...')):'',
           );
         } else {
           $term = taxonomy_term_load($item['tid']);
