@@ -1,13 +1,23 @@
 .media {
-    margin-top: 15px;
     display: block;
 }
 
 .media-left,.media-body {
     display: table-cell;
-    vertical-align: top;
+    vertical-align: bottom;
 }
 
 .media-left {
     padding-right: 10px;
+    vertical-align: top;
+}
+
+.img-avatar {
+    height: 56px;
+    width: 56px;
+    vertical-align: middle;
+}
+
+.img-circle {
+    border-radius: 100%;
 }
