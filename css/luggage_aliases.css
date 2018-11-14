@@ -1,23 +1,51 @@
-.media {
-    display: block;
+.field-name-field-hn-authors.field-type-taxonomy-term-reference .field-item {
+  display: block;
 }
 
-.media-left,.media-body {
-    display: table-cell;
-    vertical-align: bottom;
+.field-name-field-hn-authors .media {
+    /* Overrides blog_blog.css */
+    display: flex !important;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
 }
 
-.media-left {
-    padding-right: 10px;
-    vertical-align: top;
+.field-name-field-hn-authors .media-left {
+    flex: 0 0 auto;
+    margin-right: 1rem;
+    margin-bottom: 0.5rem;
+    padding: 0;
 }
 
-.img-avatar {
-    height: 56px;
-    width: 56px;
-    vertical-align: middle;
+.field-name-field-hn-authors .media-left img {
+    border: 1px solid #ddd;
 }
 
-.img-circle {
-    border-radius: 100%;
+.field-name-field-hn-authors .media-heading { 
+    margin-top: 0; 
+    margin-bottom: 0;
+}
+
+.field-name-field-hn-authors.field-type-taxonomy-term-reference .field-item a {
+  margin: 0;
+  padding: 0;
+  color: #cc0000;
+  text-decoration: underline;
+  background: transparent;
+  border-radius: 0;
+  border: 0;
+}
+
+  .field-name-field-hn-authors.field-type-taxonomy-term-reference .field-item a:hover {
+    text-decoration: underline;
+    background: transparent;
+  }
+
+.field-name-field-hn-authors .media-heading .luggage-alias_position {
+  font-size: 0.95rem;
+}
+.field-name-field-hn-authors .media-body .luggage-alias_bio {
+  margin-top: 0.5rem;
 }
