@@ -40,8 +40,28 @@ function _luggage_aliases_people_node_form_submit($form, &$form_state) {
   }
 }
 
+/**
+ * Generate alias name.
+ */
 function _luggage_aliases_getTermName($form_state) {
-  $title = $form_state['values']['field_people_title'][LANGUAGE_NONE][0]['value'] . ' ' .  $form_state['values']['field_people_first_name'][LANGUAGE_NONE][0]['value'] . ' ' . $form_state['values']['field_people_middle_initial'][LANGUAGE_NONE][0]['value'] . ' ' . $form_state['values']['field_people_last_name'][LANGUAGE_NONE][0]['value'];
+  $title = '';
+    if ($form_state['values']['field_people_title'][LANGUAGE_NONE][0]['value'] !== '') {
+      $title_value = $form_state['values']['field_people_title'][LANGUAGE_NONE][0]['value'];
+      $title_label = $form_state['field']['field_people_title']['und']['field']['settings']['allowed_values'][$title_value];
+      $title .= $title_label . ' ';
+    }
+    if ($form_state['values']['field_people_first_name'][LANGUAGE_NONE][0]['value'] !== '') {
+      $first_name = $form_state['values']['field_people_first_name'][LANGUAGE_NONE][0]['value'] . ' ';
+      $title .= $first_name;
+    }
+    if ($form_state['values']['field_people_middle_initial'][LANGUAGE_NONE][0]['value'] !== '') {
+      $middle_initial = $form_state['values']['field_people_middle_initial'][LANGUAGE_NONE][0]['value'] . ' ';
+      $title .= $middle_initial;
+    }
+    if ($form_state['values']['field_people_last_name'][LANGUAGE_NONE][0]['value'] !== '') {
+      $last_name = $form_state['values']['field_people_last_name'][LANGUAGE_NONE][0]['value'];
+      $title .= $last_name;
+    }
   return trim($title);
 }
 
