@@ -61,6 +61,7 @@ function luggage_aliases_update_7101() {
       $term = array_slice($term,0,1)[0];
       $term->name = trim($title);
       taxonomy_term_save($term);
+      drupal_set_message('Updated ' . $term->name . ' Alias');
     }
   }
 }
