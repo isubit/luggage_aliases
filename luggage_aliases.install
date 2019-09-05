@@ -15,6 +15,9 @@ function luggage_aliases_update_7101() {
       $field_title_first_item = reset($field_title);
       $field_title_value = $field_title_first_item['value'];
     }
+    else {
+      $field_title_value = '';
+    }
     $field_first_name = field_get_items('node', $node, 'field_people_first_name');
     if (!empty($field_first_name)) {
       $field_first_name_first_item = reset($field_first_name);
@@ -24,6 +27,9 @@ function luggage_aliases_update_7101() {
     if (!empty($field_middle_initial)) {
       $field_middle_initial_first_item = reset($field_middle_initial);
       $field_middle_initial_value = $field_middle_initial_first_item['value'];
+    }
+    else {
+      $field_middle_initial_value = '';
     }
     $field_last_name = field_get_items('node', $node, 'field_people_last_name');
     if (!empty($field_last_name)) {
@@ -36,19 +42,19 @@ function luggage_aliases_update_7101() {
     $term = taxonomy_get_term_by_name($old_title, 'aliases');
     if (count($term) > 0) {
       $title = '';
-      if (isset($field_title_value) && $field_title_value !== '') {
+      if (isset($field_title_value) && !empty($field_title_value)) {
         $title_label = 'Dr.';
         $title .= $title_label . ' ';
       }
-      if ($field_first_name_value !== '') {
+      if (!empty($field_first_name_value)) {
         $first_name = $field_first_name_value . ' ';
         $title .= $first_name;
       }
-      if ($field_middle_initial_value !== '') {
+      if (!empty($field_middle_initial_value)) {
         $middle_initial = $field_middle_initial_value . ' ';
         $title .= $middle_initial;
       }
-      if ($field_last_name_value !== '') {
+      if (!empty($field_last_name_value)) {
         $last_name = $field_last_name_value;
         $title .= $last_name;
       }
