@@ -45,7 +45,7 @@ function _luggage_aliases_people_node_form_submit($form, &$form_state) {
  */
 function _luggage_aliases_getTermName($form_state) {
   $title = '';
-    if ($form_state['values']['field_people_title'][LANGUAGE_NONE][0]['value'] !== '') {
+    if (isset($form_state['values']['field_people_title'][LANGUAGE_NONE][0]['value']) && $form_state['values']['field_people_title'][LANGUAGE_NONE][0]['value'] !== '') {
       $title_value = $form_state['values']['field_people_title'][LANGUAGE_NONE][0]['value'];
       $title_label = $form_state['field']['field_people_title']['und']['field']['settings']['allowed_values'][$title_value];
       $title .= $title_label . ' ';
