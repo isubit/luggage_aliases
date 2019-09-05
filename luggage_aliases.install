@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * LUGG-1190 Update existing aliases to new alias format.
+ */
+function luggage_aliases_update_7101() {
+  $query = new EntityFieldQuery();
+  $result = $query->entityCondition('entity_type', 'node')
+    ->entityCondition('bundle', 'people')
+    ->execute();
+  $nodes = node_load_multiple(array_keys($result['node']));
+  foreach ($nodes as $node) {
+    $field_title = field_get_items('node', $node, 'field_people_title');
+    if (!empty($field_title)) {
+      $field_title_first_item = reset($field_title);
+      $field_title_value = $field_title_first_item['value'];
+    }
+    $field_first_name = field_get_items('node', $node, 'field_people_first_name');
+    if (!empty($field_first_name)) {
+      $field_first_name_first_item = reset($field_first_name);
+      $field_first_name_value = $field_first_name_first_item['value'];
+    }
+    $field_middle_initial = field_get_items('node', $node, 'field_people_middle_initial');
+    if (!empty($field_middle_initial)) {
+      $field_middle_initial_first_item = reset($field_middle_initial);
+      $field_middle_initial_value = $field_middle_initial_first_item['value'];
+    }
+    $field_last_name = field_get_items('node', $node, 'field_people_last_name');
+    if (!empty($field_last_name)) {
+      $field_last_name_first_item = reset($field_last_name);
+      $field_last_name_value = $field_last_name_first_item['value'];
+    }
+
+    $old_title = $field_title_value . ' ' .  $field_first_name_value . ' ' . $field_middle_initial_value . ' ' . $field_last_name_value;
+    $old_title = trim($old_title);
+    $term = taxonomy_get_term_by_name($old_title, 'aliases');
+    if (count($term) > 0) {
+      $title = '';
+      if (isset($field_title_value) && $field_title_value !== '') {
+        $title_label = 'Dr.';
+        $title .= $title_label . ' ';
+      }
+      if ($field_first_name_value !== '') {
+        $first_name = $field_first_name_value . ' ';
+        $title .= $first_name;
+      }
+      if ($field_middle_initial_value !== '') {
+        $middle_initial = $field_middle_initial_value . ' ';
+        $title .= $middle_initial;
+      }
+      if ($field_last_name_value !== '') {
+        $last_name = $field_last_name_value;
+        $title .= $last_name;
+      }
+      $term = array_slice($term,0,1)[0];
+      $term->name = trim($title);
+      taxonomy_term_save($term);
+    }
+  }
+}
