@@ -26,7 +26,7 @@ function luggage_aliases_node_presave($node) {
     if (empty($node->field_people_aliases[LANGUAGE_NONE][0]['tid'])) {
       $term_name = _luggage_aliases_assemble_term_name($node);
       if (!empty($term_name)) {
-        $term = _luggage_aliases_generate_term($node, $term_name);
+        $term = _luggage_aliases_generate_term($term_name);
         $node->field_people_aliases[LANGUAGE_NONE][0]['tid'] = $term->tid;
       }
     }
@@ -91,7 +91,7 @@ function _luggage_aliases_assemble_term_name($node) {
  *
  * @return The newly created term object.
  */
-function _luggage_aliases_generate_term($nid, $term_name) {
+function _luggage_aliases_generate_term($term_name) {
   $vocabulary = taxonomy_vocabulary_machine_name_load('aliases');
 
   $term = new stdClass();
