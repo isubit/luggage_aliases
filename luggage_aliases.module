@@ -13,61 +13,94 @@ const LUGGAGE_ALIASES_VOCAB_NAME = 'aliases';
  * Implements hook_FORM_ID_form_alter()
  */
 function luggage_aliases_form_people_node_form_alter(&$form, &$form_state, $form_id) {
-  $form['#submit'][] = '_luggage_aliases_people_node_form_submit';
   $form['field_people_aliases']['#access'] = false;
 }
 
-function _luggage_aliases_people_node_form_submit($form, &$form_state) {
-  $title = _luggage_aliases_getTermName($form_state);
-  if(count($form_state['values']['field_people_aliases'][LANGUAGE_NONE]) == 0) {
-    // There is no alias assigned to this person
-    // Create alias
-    $t = taxonomy_get_term_by_name($title,LUGGAGE_ALIASES_VOCAB_NAME);
-    if(count($t) == 0) {
-      // There is no term in the vocabulary with the same name
-      // Create a new term
-      $form_state['values']['field_people_aliases'][LANGUAGE_NONE][] = (array)_luggage_aliases_createTerm($title);
+/**
+ * Implements hook_node_presave().
+ */
+function luggage_aliases_node_presave($node) {
+  // Maintain people node alias mapping.
+  if ($node->type == 'people') {
+    // If there is no alias term for this node, create one.
+    if (empty($node->field_people_aliases[LANGUAGE_NONE][0]['tid'])) {
+      $term_name = _luggage_aliases_assemble_term_name($node);
+      if (!empty($term_name)) {
+        $term = _luggage_aliases_generate_term($node, $term_name);
+        $node->field_people_aliases[LANGUAGE_NONE][0]['tid'] = $term->tid;
+      }
     }
-  } else if($title !== trim($form['#node']->title)) {
-    // The person title has changed
-    // Rename alias
-    $t = taxonomy_get_term_by_name($form_state['values']['field_people_aliases'][LANGUAGE_NONE][0]['name'],LUGGAGE_ALIASES_VOCAB_NAME);
-    if(count($t) > 0) {
-      $t = array_slice($t,0,1)[0];
-      $t->name = $title;
-      taxonomy_term_save($t);
+    // Otherwise check if the term name needs updated.
+    else {
+      // Make sure we're updating a node and not creating a new one.
+      if (isset($node->original)) {
+        $original_term_name = _luggage_aliases_assemble_term_name($node->original);
+        $new_term_name = _luggage_aliases_assemble_term_name($node);
+
+        if ($original_term_name != $new_term_name) {
+          // Update the term name
+          $term = taxonomy_term_load($node->field_people_aliases[LANGUAGE_NONE][0]['tid']);
+          $term->name = $new_term_name;
+          taxonomy_term_save($term);
+        }
+      }
     }
   }
-}
-
-function _luggage_aliases_getTermName($form_state) {
-  $title = $form_state['values']['field_people_title'][LANGUAGE_NONE][0]['value'] . ' ' .  $form_state['values']['field_people_first_name'][LANGUAGE_NONE][0]['value'] . ' ' . $form_state['values']['field_people_middle_initial'][LANGUAGE_NONE][0]['value'] . ' ' . $form_state['values']['field_people_last_name'][LANGUAGE_NONE][0]['value'];
-  return trim($title);
-}
-
-function _luggage_aliases_createTerm($name) {
-  $term = new stdClass();
-  $term->vid = _luggage_aliases_get_vocab_id(LUGGAGE_ALIASES_VOCAB_NAME)->vid;
-  $term->name = $name;
-  $term->description = '';
-  taxonomy_term_save($term);
-  return $term;
 }
 
 /**
- * @param $vocab_machine_name
- * @return null or vocabulary object
+ * Helper function to generate a consistent alias term name from node values.
+ *
+ * WARNING: If this format will be changed. All nodes in the system will need
+ * to be updated.
+ *
+ * @param $node - A node object that has the expected fields to generate the
+ * combined name.
  */
-function _luggage_aliases_get_vocab_id($vocab_machine_name) {
-  $vocabularies = taxonomy_get_vocabularies();
-  $vocab = Null;
-  foreach($vocabularies as $v) {
-    if($v->machine_name == $vocab_machine_name) {
-      $vocab = $v;
-      break;
-    }
+function _luggage_aliases_assemble_term_name($node) {
+  $term_name = '';
+
+  // Title
+  if (!empty($node->field_people_title[LANGUAGE_NONE][0]['value'])) {
+    // Manipulate mr to Mr. etc. We don't have easy access to the allowed
+    // values here.
+    $term_name .= trim(ucfirst($node->field_people_title[LANGUAGE_NONE][0]['value']) . '.') . ' ';
   }
-  return $vocab;
+
+  // First Name
+  if (!empty($node->field_people_first_name[LANGUAGE_NONE][0]['value'])) {
+    $term_name .= trim($node->field_people_first_name[LANGUAGE_NONE][0]['value']) . ' ';
+  }
+
+  // Middle Initial
+  if (!empty($node->field_people_middle_initial[LANGUAGE_NONE][0]['value'])) {
+    $term_name .= trim($node->field_people_middle_initial[LANGUAGE_NONE][0]['value']) . ' ';
+  }
+
+  // Last Name
+  if (!empty($node->field_people_last_name[LANGUAGE_NONE][0]['value'])) {
+    $term_name .= trim($node->field_people_last_name[LANGUAGE_NONE][0]['value']) . ' ';
+  }
+
+  return trim($term_name);
+}
+
+/**
+ * @param $nid
+ * @param $term_name
+ *
+ * @return The newly created term object.
+ */
+function _luggage_aliases_generate_term($nid, $term_name) {
+  $vocabulary = taxonomy_vocabulary_machine_name_load('aliases');
+
+  $term = new stdClass();
+  $term->name = trim($term_name);
+  $term->vid = $vocabulary->vid;
+
+  taxonomy_term_save($term);
+
+  return $term;
 }
 
 /**
