@@ -1,0 +1,14 @@
+<?php
+
+function luggage_aliases_install() {
+  // Re-save all existing people nodes to populate aliases vocabulary.
+  luggage_aliases_update_people_nodes();
+}
+
+/**
+ * LUGG-1190 Update alias term names.
+ */
+function luggage_aliases_update_7100() {
+  include_once('luggage_aliases.module');
+  luggage_aliases_update_people_nodes();
+}
