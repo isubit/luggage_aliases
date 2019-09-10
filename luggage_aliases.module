@@ -115,7 +115,7 @@ function luggage_aliases_update_people_nodes() {
   }
   else {
     drupal_set_message('Unable to update aliases: field_people_aliases wasn\'t found on the people content type.', 'warning');
-    watchdog('warning', 'Unable to update aliases, field not found', WATCHDOG_ERROR);
+    watchdog('luggage_aliases', 'Unable to update aliases, field not found', NULL,WATCHDOG_ERROR);
   }
 }
 
@@ -135,6 +135,14 @@ function _luggage_aliases_generate_term($term_name) {
   taxonomy_term_save($term);
 
   return $term;
+}
+
+/**
+ * Implements hook_post_features_enable_feature().
+ */
+function luggage_aliases_post_features_enable_feature($component) {
+  watchdog('luggage_aliases', 'Initializing aliases vocabulary', NULL, WATCHDOG_INFO);
+  luggage_aliases_update_people_nodes();
 }
 
 /**

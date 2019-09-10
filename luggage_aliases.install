@@ -1,9 +1,15 @@
 <?php
 
+/*
 function luggage_aliases_install() {
   // Re-save all existing people nodes to populate aliases vocabulary.
-  luggage_aliases_update_people_nodes();
+
+  // NOTE: You might expect this to be here, but because features components
+  // are not done until after install, you'll find the code for populating
+  // the aliases vocabulary in luggage_aliases_post_features_enable_feature()
+  // in luggage_aliases.module.
 }
+*/
 
 /**
  * LUGG-1190 Update alias term names.
