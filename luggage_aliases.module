@@ -138,14 +138,6 @@ function _luggage_aliases_generate_term($term_name) {
 }
 
 /**
- * Implements hook_post_features_enable_feature().
- */
-function luggage_aliases_post_features_enable_feature($component) {
-  watchdog('luggage_aliases', 'Initializing aliases vocabulary', NULL, WATCHDOG_INFO);
-  luggage_aliases_update_people_nodes();
-}
-
-/**
  * Implements hook_field_formatter_info()
  */
 function luggage_aliases_field_formatter_info() {
