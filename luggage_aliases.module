@@ -34,7 +34,10 @@ function luggage_aliases_node_presave($node) {
     else {
       // Make sure we're updating a node and not creating a new one.
       if (isset($node->original)) {
-        $original_term_name = _luggage_aliases_assemble_term_name($node->original);
+        // Get the original node term name from the taxonomy term.
+        $original_term = taxonomy_term_load($node->original->field_people_aliases['und'][0]['tid']);
+        $original_term_name = $original_term->name;
+
         $new_term_name = _luggage_aliases_assemble_term_name($node);
 
         if ($original_term_name != $new_term_name) {
@@ -42,6 +45,7 @@ function luggage_aliases_node_presave($node) {
           $term = taxonomy_term_load($node->field_people_aliases[LANGUAGE_NONE][0]['tid']);
           $term->name = $new_term_name;
           taxonomy_term_save($term);
+          watchdog('luggage_aliases', "Updated alias term %tid name from %original to %new", array('%tid' => $term->tid, '%original' => $original_term_name, '%new' => $new_term_name), WATCHDOG_INFO);
         }
       }
     }
