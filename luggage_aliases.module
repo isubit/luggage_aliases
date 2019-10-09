@@ -66,9 +66,10 @@ function _luggage_aliases_assemble_term_name($node) {
 
   // Title
   if (!empty($node->field_people_title[LANGUAGE_NONE][0]['value'])) {
-    // Manipulate mr to Mr. etc. We don't have easy access to the allowed
-    // values here.
-    $term_name .= trim(ucfirst($node->field_people_title[LANGUAGE_NONE][0]['value']) . '.') . ' ';
+    // Get the labe for the value of the title field.
+    $title = $node->field_people_title[LANGUAGE_NONE][0]['value'];
+    $field = field_info_field('field_people_title');
+    $term_name .= $field['settings']['allowed_values'][$title];
   }
 
   // First Name
