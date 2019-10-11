@@ -1,0 +1,131 @@
+<?php
+
+/**
+ * Implements hook_requirements().
+ */
+function luggage_aliases_requirements($phase) {
+  $requirements = array();
+
+  if ($phase == 'install') {
+    // Make sure the aliases vocabulary doesn't already exist.
+    if (taxonomy_vocabulary_machine_name_load('aliases')) {
+      $requirements['aliases_already_exist'] = array(
+        'title' => t('Vocabulary "aliases" already exists. Unable to install.'),
+        'description' => t('Vocabulary "aliases" already exists. Unable to install.'),
+        'severity' => REQUIREMENT_ERROR,
+      );
+    }
+  }
+}
+
+/**
+ * Implements hook_install().
+ */
+function luggage_aliases_install() {
+  // Features doesn't have a way to add items to a vocabulary during install.
+  // We have to create the vocabulary here and populate it manually. You will
+  // not see the aliases vocabulary in the feature.
+  $aliases_vocabulary = (object) array(
+    'name' => 'Aliases',
+    'machine_name' => 'aliases',
+    'description' => '',
+  );
+  taxonomy_vocabulary_save($aliases_vocabulary);
+
+  // Add aliases field to the people content type as well. Because features.
+  $field_base = array(
+    'active' => 1,
+    'cardinality' => -1,
+    'deleted' => 0,
+    'entity_types' => array(),
+    'field_name' => 'field_people_aliases',
+    'indexes' => array(
+      'tid' => array(
+        0 => 'tid',
+      ),
+    ),
+    'locked' => 0,
+    'module' => 'taxonomy',
+    'settings' => array(
+      'allowed_values' => array(
+        0 => array(
+          'vocabulary' => 'aliases',
+          'parent' => 0,
+        ),
+      ),
+    ),
+    'translatable' => 0,
+    'type' => 'taxonomy_term_reference',
+  );
+  field_create_field($field_base);
+
+  $field_instance = array(
+    'bundle' => 'people',
+    'default_value' => NULL,
+    'deleted' => 0,
+    'description' => '',
+    'display' => array(
+      'default' => array(
+        'label' => 'above',
+        'module' => 'taxonomy',
+        'settings' => array(),
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 26,
+      ),
+      'full' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_index' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'search_result' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+      'teaser' => array(
+        'label' => 'above',
+        'settings' => array(),
+        'type' => 'hidden',
+        'weight' => 0,
+      ),
+    ),
+    'entity_type' => 'node',
+    'field_name' => 'field_people_aliases',
+    'label' => 'Alias Names',
+    'placeholder' => '',
+    'required' => 0,
+    'settings' => array(
+      'user_register_form' => FALSE,
+    ),
+    'widget' => array(
+      'active' => 0,
+      'module' => 'taxonomy',
+      'settings' => array(
+        'autocomplete_path' => 'taxonomy/autocomplete',
+        'size' => 60,
+      ),
+      'type' => 'taxonomy_autocomplete',
+      'weight' => 28,
+    ),
+  );
+  field_create_instance($field_instance);
+
+  // Populate the vocabulary.
+  luggage_aliases_update_people_nodes();
+}
+
+/**
+ * LUGG-1190 Update alias term names.
+ */
+function luggage_aliases_update_7100() {
+  include_once('luggage_aliases.module');
+  luggage_aliases_update_people_nodes();
+}
